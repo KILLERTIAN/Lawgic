@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Message {
   id: string;
@@ -17,7 +19,7 @@ const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      content: "Hello! I'm your AI Legal Assistant. I can help you with legal questions, document analysis, and provide guidance on various legal matters. What legal question can I help you with today?",
+      content: "Hello! I'm Lawgic, your AI Legal Assistant powered by ChainOpera's decentralized AI platform. I can help you with legal questions, document analysis, case law research, and provide comprehensive legal guidance. What legal question can I help you with today?",
       role: "assistant",
       timestamp: new Date(),
     },
@@ -26,6 +28,7 @@ const ChatInterface = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -46,29 +49,62 @@ const ChatInterface = () => {
     };
 
     setMessages(prev => [...prev, newUserMessage]);
+    const currentMessage = inputMessage;
     setInputMessage("");
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Call Supabase Edge Function for ChainOpera AI
+      const { data, error } = await supabase.functions.invoke('chat-with-ai', {
+        body: { message: currentMessage }
+      });
+
+      if (error) {
+        throw error;
+      }
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: `Thank you for your legal question: "${inputMessage}". As an AI legal assistant, I can provide general legal information. However, please note that this is not legal advice and should not substitute for consultation with a qualified attorney. 
-
-Based on your query, here are some general considerations:
-
-1. **Legal Framework**: The relevant laws may vary by jurisdiction
-2. **Documentation**: Proper documentation is crucial for legal matters
-3. **Professional Consultation**: For specific legal advice, consider consulting with a licensed attorney
-
-Would you like me to elaborate on any specific aspect of your question?`,
+        content: data.response,
         role: "assistant",
         timestamp: new Date(),
       };
       
       setMessages(prev => [...prev, aiResponse]);
+      
+      // Show success toast
+      toast({
+        title: "Response from Lawgic",
+        description: "Powered by ChainOpera's decentralized AI platform",
+        duration: 3000,
+      });
+
+    } catch (error) {
+      console.error('Error calling AI:', error);
+      
+      // Fallback response
+      const fallbackResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        content: `Thank you for your legal question: "${currentMessage}". I'm experiencing connectivity issues with the ChainOpera AI platform. Please try again in a moment, or feel free to ask another question.
+
+As Lawgic, I'm designed to provide comprehensive legal guidance powered by ChainOpera's decentralized AI. Once connectivity is restored, I'll be able to give you detailed legal analysis and guidance.
+
+**Disclaimer**: This is general legal information, not legal advice. For specific legal matters, please consult with a qualified attorney.`,
+        role: "assistant",
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, fallbackResponse]);
+      
+      toast({
+        title: "Connection Issue",
+        description: "Please try again. Using fallback response for now.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally {
       setIsTyping(false);
-    }, 2000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -83,19 +119,22 @@ Would you like me to elaborate on any specific aspect of your question?`,
   };
 
   return (
-    <div className="flex flex-col h-screen max-h-[800px] bg-gradient-card rounded-lg shadow-elegant border border-border/50 overflow-hidden">
+    <div className="flex flex-col h-screen max-h-[800px] glass-card shadow-multi border border-white/20 overflow-hidden">
       {/* Chat Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-primary text-primary-foreground">
+      <div className="flex items-center justify-between p-4 border-b border-white/20 bg-gradient-primary text-primary-foreground">
         <div className="flex items-center space-x-3">
-          <div className="bg-primary-foreground/20 p-2 rounded-lg">
+          <div className="bg-white/20 p-2 rounded-lg floating-animation">
             <Scale className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-semibold">LexiAssist AI</h3>
-            <p className="text-sm opacity-90">Legal AI Assistant</p>
+            <h3 className="font-semibold flex items-center gap-2">
+              Lawgic AI
+              <Sparkles className="w-4 h-4 animate-pulse" />
+            </h3>
+            <p className="text-sm opacity-90">Powered by ChainOpera</p>
           </div>
         </div>
-        <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary-foreground/20">
+        <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-white/20 transition-all duration-300">
           <MoreVertical className="w-5 h-5" />
         </Button>
       </div>
@@ -117,10 +156,10 @@ Would you like me to elaborate on any specific aspect of your question?`,
               )}
               
               <div
-                className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                className={`max-w-[80%] rounded-2xl px-4 py-3 transition-all duration-300 ${
                   message.role === "user"
-                    ? "bg-chat-user text-chat-user-foreground ml-12"
-                    : "bg-chat-assistant text-chat-assistant-foreground border border-border/50"
+                    ? "bg-gradient-primary text-primary-foreground ml-12 shadow-glow"
+                    : "glass-card border border-white/30 shadow-card"
                 }`}
               >
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
@@ -141,17 +180,18 @@ Would you like me to elaborate on any specific aspect of your question?`,
 
           {/* Typing Indicator */}
           {isTyping && (
-            <div className="flex gap-3 justify-start">
-              <Avatar className="w-8 h-8 bg-primary">
-                <AvatarFallback className="bg-primary text-primary-foreground">
+            <div className="flex gap-3 justify-start fade-in-scale">
+              <Avatar className="w-8 h-8 bg-gradient-primary pulse-glow">
+                <AvatarFallback className="bg-transparent text-primary-foreground">
                   <Bot className="w-4 h-4" />
                 </AvatarFallback>
               </Avatar>
-              <div className="bg-chat-assistant border border-border/50 rounded-2xl px-4 py-3">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-pulse delay-100"></div>
-                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-pulse delay-200"></div>
+              <div className="glass-card border border-white/30 rounded-2xl px-4 py-3">
+                <div className="flex space-x-1 items-center">
+                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse delay-100"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse delay-200"></div>
+                  <span className="text-xs text-muted-foreground ml-2">Lawgic is thinking...</span>
                 </div>
               </div>
             </div>
@@ -161,9 +201,9 @@ Would you like me to elaborate on any specific aspect of your question?`,
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-border bg-background/50">
+      <div className="p-4 border-t border-white/20 glass">
         <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
+          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-105">
             <Paperclip className="w-5 h-5" />
           </Button>
           
@@ -173,15 +213,15 @@ Would you like me to elaborate on any specific aspect of your question?`,
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask me any legal question..."
-              className="pr-12 border-border focus:border-primary bg-background"
+              placeholder="Ask Lawgic any legal question..."
+              className="pr-12 border-white/30 focus:border-primary bg-white/5 backdrop-blur-sm transition-all duration-300"
               disabled={isTyping}
             />
             <Button
               onClick={handleSendMessage}
               disabled={!inputMessage.trim() || isTyping}
               size="icon"
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-gradient-primary hover:shadow-glow transition-all duration-200"
+              className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-gradient-primary hover:shadow-multi transition-all duration-300 pulse-glow"
             >
               <Send className="w-4 h-4" />
             </Button>
@@ -190,8 +230,8 @@ Would you like me to elaborate on any specific aspect of your question?`,
         
         {/* Disclaimer */}
         <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-          <Sparkles className="w-3 h-3" />
-          <span>AI-generated legal information. Not a substitute for professional legal advice.</span>
+          <Sparkles className="w-3 h-3 text-accent animate-pulse" />
+          <span>Powered by ChainOpera's decentralized AI • General legal information only</span>
         </div>
       </div>
     </div>

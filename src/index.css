@@ -2,13 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Lawgic - Advanced Legal AI Design System with Glassmorphism & Glow Effects
+All colors MUST be HSL for consistency.
 */
 
 @layer base {
   :root {
-    /* Legal Professional Theme */
+    /* Lawgic Professional Theme */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
@@ -18,10 +18,11 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Legal Blue Primary */
+    /* Lawgic Brand Colors - Legal Blue with Gold Accents */
     --primary: 220 100% 25%;
     --primary-foreground: 0 0% 98%;
     --primary-glow: 220 100% 35%;
+    --primary-light: 220 100% 85%;
 
     /* Professional Secondary */
     --secondary: 210 20% 98%;
@@ -30,9 +31,10 @@ All colors MUST be HSL.
     --muted: 220 14% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    /* Gold Accent for Premium Feel */
+    /* Premium Gold Accent */
     --accent: 45 93% 47%;
     --accent-foreground: 222.2 47.4% 11.2%;
+    --accent-light: 45 93% 85%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -49,18 +51,33 @@ All colors MUST be HSL.
     --chat-assistant: 0 0% 98%;
     --chat-assistant-foreground: 222.2 84% 4.9%;
 
-    /* Gradients */
+    /* Glassmorphism Effects */
+    --glass-bg: 0 0% 100% / 0.1;
+    --glass-border: 0 0% 100% / 0.2;
+    --glass-shadow: 0 8px 32px 0 hsl(220 100% 25% / 0.1);
+    
+    /* Advanced Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(220 100% 25%), hsl(220 100% 35%));
-    --gradient-hero: linear-gradient(135deg, hsl(220 100% 25%) 0%, hsl(260 100% 35%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(220 100% 25%) 0%, hsl(260 100% 35%) 50%, hsl(45 93% 47%) 100%);
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(220 14% 98%) 100%);
+    --gradient-glass: linear-gradient(145deg, hsl(0 0% 100% / 0.1) 0%, hsl(220 14% 98% / 0.05) 100%);
+    --gradient-glow: radial-gradient(circle at center, hsl(220 100% 35% / 0.4) 0%, transparent 70%);
 
-    /* Shadows */
-    --shadow-elegant: 0 10px 30px -10px hsl(220 100% 25% / 0.1);
-    --shadow-glow: 0 0 40px hsl(220 100% 35% / 0.15);
+    /* Enhanced Shadows & Glows */
+    --shadow-elegant: 0 10px 30px -10px hsl(220 100% 25% / 0.15);
+    --shadow-glow: 0 0 40px hsl(220 100% 35% / 0.3);
     --shadow-card: 0 4px 20px -4px hsl(220 100% 25% / 0.08);
+    --shadow-glass: 0 8px 32px 0 hsl(220 100% 25% / 0.1);
+    --shadow-inner-glow: inset 0 0 20px hsl(220 100% 35% / 0.1);
+    --shadow-multi: 
+      0 0 20px hsl(220 100% 35% / 0.2),
+      0 0 40px hsl(220 100% 35% / 0.1),
+      0 0 80px hsl(220 100% 35% / 0.05);
 
-    /* Animation */
+    /* Advanced Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-glow: all 0.3s ease-in-out;
 
     --sidebar-background: 0 0% 98%;
 
@@ -126,4 +143,115 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Glassmorphism Components */
+@layer components {
+  .glass {
+    @apply backdrop-blur-md border border-white/20;
+    background: linear-gradient(145deg, 
+      hsl(var(--glass-bg)), 
+      hsl(var(--glass-bg) / 0.05)
+    );
+    box-shadow: var(--shadow-glass);
+  }
+
+  .glass-card {
+    @apply glass rounded-2xl p-6;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .glow-effect {
+    position: relative;
+  }
+
+  .glow-effect::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: var(--gradient-glow);
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0;
+    transition: var(--transition-glow);
+  }
+
+  .glow-effect:hover::before {
+    opacity: 1;
+  }
+
+  .floating-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .pulse-glow {
+    animation: pulseGlow 3s ease-in-out infinite;
+  }
+
+  .slide-up {
+    animation: slideUp 0.6s ease-out;
+  }
+
+  .fade-in-scale {
+    animation: fadeInScale 0.5s ease-out;
+  }
+}
+
+/* Advanced Keyframe Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { 
+    box-shadow: var(--shadow-glow);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: var(--shadow-multi);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--primary-light) / 0.4),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
 }
