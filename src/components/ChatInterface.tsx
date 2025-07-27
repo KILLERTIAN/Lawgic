@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Message {
   id: string;
@@ -119,9 +120,19 @@ As Lawgic, I'm designed to provide comprehensive legal guidance powered by Chain
   };
 
   return (
-    <div className="flex flex-col h-screen max-h-[800px] glass-card shadow-multi border border-white/20 overflow-hidden">
+    <motion.div 
+      className="flex flex-col h-screen max-h-[800px] glass-card shadow-multi border border-white/20 overflow-hidden"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       {/* Chat Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/20 bg-gradient-primary text-primary-foreground">
+      <motion.div 
+        className="flex items-center justify-between p-4 border-b border-white/20 bg-gradient-primary text-primary-foreground"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
         <div className="flex items-center space-x-3">
           <div className="bg-white/20 p-2 rounded-lg floating-animation">
             <Scale className="w-5 h-5" />
@@ -134,19 +145,26 @@ As Lawgic, I'm designed to provide comprehensive legal guidance powered by Chain
             <p className="text-sm opacity-90">Powered by ChainOpera</p>
           </div>
         </div>
-        <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-white/20 transition-all duration-300">
-          <MoreVertical className="w-5 h-5" />
-        </Button>
-      </div>
+        <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+          <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-white/20 transition-all duration-300">
+            <MoreVertical className="w-5 h-5" />
+          </Button>
+        </motion.div>
+      </motion.div>
 
       {/* Messages Area */}
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
-            >
+          <AnimatePresence>
+            {messages.map((message, index) => (
+              <motion.div
+                key={message.id}
+                className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+              >
               {message.role === "assistant" && (
                 <Avatar className="w-8 h-8 bg-primary">
                   <AvatarFallback className="bg-primary text-primary-foreground">
@@ -155,18 +173,22 @@ As Lawgic, I'm designed to provide comprehensive legal guidance powered by Chain
                 </Avatar>
               )}
               
-              <div
+              <motion.div
                 className={`max-w-[80%] rounded-2xl px-4 py-3 transition-all duration-300 ${
                   message.role === "user"
                     ? "bg-gradient-primary text-primary-foreground ml-12 shadow-glow"
-                    : "glass-card border border-white/30 shadow-card"
+                    : "glass-card border border-white/30 shadow-card text-foreground"
                 }`}
+                whileHover={{ scale: 1.02 }}
+                layout
               >
-                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                <span className={`text-xs mt-1 block opacity-70`}>
+                <p className={`text-sm leading-relaxed whitespace-pre-wrap ${message.role === "user" ? "text-primary-foreground" : "text-foreground"}`}>
+                  {message.content}
+                </p>
+                <span className={`text-xs mt-1 block ${message.role === "user" ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
                   {formatTime(message.timestamp)}
                 </span>
-              </div>
+              </motion.div>
 
               {message.role === "user" && (
                 <Avatar className="w-8 h-8 bg-muted">
@@ -175,12 +197,20 @@ As Lawgic, I'm designed to provide comprehensive legal guidance powered by Chain
                   </AvatarFallback>
                 </Avatar>
               )}
-            </div>
-          ))}
+            </motion.div>
+            ))}
+          </AnimatePresence>
 
           {/* Typing Indicator */}
-          {isTyping && (
-            <div className="flex gap-3 justify-start fade-in-scale">
+          <AnimatePresence>
+            {isTyping && (
+              <motion.div 
+                className="flex gap-3 justify-start"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
               <Avatar className="w-8 h-8 bg-gradient-primary pulse-glow">
                 <AvatarFallback className="bg-transparent text-primary-foreground">
                   <Bot className="w-4 h-4" />
@@ -188,24 +218,44 @@ As Lawgic, I'm designed to provide comprehensive legal guidance powered by Chain
               </Avatar>
               <div className="glass-card border border-white/30 rounded-2xl px-4 py-3">
                 <div className="flex space-x-1 items-center">
-                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse delay-100"></div>
-                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse delay-200"></div>
+                  <motion.div 
+                    className="w-2 h-2 bg-primary rounded-full"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1, repeat: Infinity, delay: 0 }}
+                  />
+                  <motion.div 
+                    className="w-2 h-2 bg-primary rounded-full"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
+                  />
+                  <motion.div 
+                    className="w-2 h-2 bg-primary rounded-full"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
+                  />
                   <span className="text-xs text-muted-foreground ml-2">Lawgic is thinking...</span>
                 </div>
               </div>
-            </div>
-          )}
+            </motion.div>
+            )}
+          </AnimatePresence>
           <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-white/20 glass">
+      <motion.div 
+        className="p-4 border-t border-white/20 glass"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
         <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-105">
-            <Paperclip className="w-5 h-5" />
-          </Button>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary transition-all duration-300">
+              <Paperclip className="w-5 h-5" />
+            </Button>
+          </motion.div>
           
           <div className="flex-1 relative">
             <Input
@@ -217,24 +267,36 @@ As Lawgic, I'm designed to provide comprehensive legal guidance powered by Chain
               className="pr-12 border-white/30 focus:border-primary bg-white/5 backdrop-blur-sm transition-all duration-300"
               disabled={isTyping}
             />
-            <Button
-              onClick={handleSendMessage}
-              disabled={!inputMessage.trim() || isTyping}
-              size="icon"
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-gradient-primary hover:shadow-multi transition-all duration-300 pulse-glow"
-            >
-              <Send className="w-4 h-4" />
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                onClick={handleSendMessage}
+                disabled={!inputMessage.trim() || isTyping}
+                size="icon"
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-gradient-primary hover:shadow-multi transition-all duration-300 pulse-glow disabled:opacity-50"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </motion.div>
           </div>
         </div>
         
         {/* Disclaimer */}
-        <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-          <Sparkles className="w-3 h-3 text-accent animate-pulse" />
+        <motion.div 
+          className="mt-3 flex items-center gap-2 text-xs text-muted-foreground"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          >
+            <Sparkles className="w-3 h-3 text-accent" />
+          </motion.div>
           <span>Powered by ChainOpera's decentralized AI • General legal information only</span>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 };
 

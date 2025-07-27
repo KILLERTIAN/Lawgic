@@ -1,9 +1,18 @@
 import { useState } from "react";
 import { Scale, Menu, X, MessageSquare, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setIsMenuOpen(false);
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -14,37 +23,63 @@ const Navbar = () => {
             <div className="bg-gradient-primary p-2 rounded-lg shadow-glow">
               <Scale className="h-6 w-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              LexiAssist AI
-            </span>
+            <motion.span 
+              className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              Lawgic
+            </motion.span>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <a href="#home" className="text-foreground hover:text-primary transition-smooth">
+          <motion.div 
+            className="hidden md:flex items-center space-x-8"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <motion.button 
+              onClick={() => handleNavigation("/")}
+              className={`text-foreground hover:text-primary transition-smooth ${location.pathname === "/" ? "text-primary font-semibold" : ""}`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               Home
-            </a>
-            <a href="#features" className="text-foreground hover:text-primary transition-smooth">
-              Features
-            </a>
-            <a href="#about" className="text-foreground hover:text-primary transition-smooth">
+            </motion.button>
+            <motion.button 
+              onClick={() => handleNavigation("/about")}
+              className={`text-foreground hover:text-primary transition-smooth ${location.pathname === "/about" ? "text-primary font-semibold" : ""}`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               About
-            </a>
-            <a href="#contact" className="text-foreground hover:text-primary transition-smooth">
-              Contact
-            </a>
-          </div>
+            </motion.button>
+          </motion.div>
 
           {/* CTA Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-              Sign In
-            </Button>
-            <Button className="bg-gradient-primary shadow-glow hover:shadow-xl transition-all duration-300">
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Start Chat
-            </Button>
-          </div>
+          <motion.div 
+            className="hidden md:flex items-center space-x-4"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300">
+                Sign In
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button 
+                onClick={() => handleNavigation("/")}
+                className="bg-gradient-primary shadow-glow hover:shadow-xl transition-all duration-300"
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Start Chat
+              </Button>
+            </motion.div>
+          </motion.div>
 
           {/* Mobile menu button */}
           <div className="md:hidden">
@@ -60,45 +95,52 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-background border-t border-border">
-              <a
-                href="#home"
-                className="block px-3 py-2 text-foreground hover:text-primary hover:bg-muted rounded-md transition-smooth"
-              >
-                Home
-              </a>
-              <a
-                href="#features"
-                className="block px-3 py-2 text-foreground hover:text-primary hover:bg-muted rounded-md transition-smooth"
-              >
-                Features
-              </a>
-              <a
-                href="#about"
-                className="block px-3 py-2 text-foreground hover:text-primary hover:bg-muted rounded-md transition-smooth"
-              >
-                About
-              </a>
-              <a
-                href="#contact"
-                className="block px-3 py-2 text-foreground hover:text-primary hover:bg-muted rounded-md transition-smooth"
-              >
-                Contact
-              </a>
-              <div className="flex flex-col space-y-2 pt-4">
-                <Button variant="outline" className="border-primary text-primary">
-                  Sign In
-                </Button>
-                <Button className="bg-gradient-primary">
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Start Chat
-                </Button>
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div 
+              className="md:hidden"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="px-2 pt-2 pb-3 space-y-1 bg-background/95 backdrop-blur-md border-t border-border">
+                <motion.button
+                  onClick={() => handleNavigation("/")}
+                  className={`block w-full text-left px-3 py-2 text-foreground hover:text-primary hover:bg-muted rounded-md transition-smooth ${location.pathname === "/" ? "text-primary font-semibold bg-muted" : ""}`}
+                  whileHover={{ x: 5 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Home
+                </motion.button>
+                <motion.button
+                  onClick={() => handleNavigation("/about")}
+                  className={`block w-full text-left px-3 py-2 text-foreground hover:text-primary hover:bg-muted rounded-md transition-smooth ${location.pathname === "/about" ? "text-primary font-semibold bg-muted" : ""}`}
+                  whileHover={{ x: 5 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  About
+                </motion.button>
+                <div className="flex flex-col space-y-2 pt-4">
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button variant="outline" className="w-full border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground">
+                      Sign In
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      onClick={() => handleNavigation("/")}
+                      className="w-full bg-gradient-primary shadow-glow"
+                    >
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Start Chat
+                    </Button>
+                  </motion.div>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </nav>
   );
