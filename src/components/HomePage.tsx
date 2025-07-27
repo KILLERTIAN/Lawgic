@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   MessageSquare, 
@@ -8,7 +10,6 @@ import {
   Search, 
   Shield, 
   Zap, 
-  Users, 
   CheckCircle, 
   ArrowRight,
   Scale,
@@ -18,31 +19,25 @@ import {
   Sparkles
 } from "lucide-react";
 import Navbar from "./Navbar";
-import HeroSection from "./HeroSection";
 import ChatGPTInterface from "./ChatGPTInterface";
 
 const HomePage = () => {
-  const [showFullChat, setShowFullChat] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
-  if (showFullChat) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="max-w-4xl mx-auto p-4 pt-8">
-          <div className="mb-4">
-            <Button
-              variant="outline"
-              onClick={() => setShowFullChat(false)}
-              className="mb-4 glass-card border-white/30"
-            >
-              ← Back to Home
-            </Button>
-          </div>
-          <ChatGPTInterface />
-        </div>
-      </div>
-    );
-  }
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Navigate to consult page with search query as state
+      navigate('/consult', { state: { initialMessage: searchQuery.trim() } });
+    } else {
+      navigate('/consult');
+    }
+  };
+
+  const handleChatNow = () => {
+    navigate('/consult');
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -64,24 +59,24 @@ const HomePage = () => {
               </div>
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 AI Legal Assistant
-                <span className="block text-accent">Powered by ChainOpera</span>
+                <span className="block text-accent">Powered by TensorOpera</span>
               </h1>
               <p className="text-xl md:text-2xl opacity-90 mb-8 leading-relaxed">
-                Get instant legal guidance through decentralized AI. Analyze documents, research case law, and receive comprehensive legal assistance.
+                Get instant legal guidance through Gemini 2.0 Flash. Analyze documents, research case law, and receive comprehensive legal assistance.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
                   size="lg" 
-                  onClick={() => setShowFullChat(true)}
+                  onClick={handleChatNow}
                   className="bg-white/20 text-primary-foreground hover:bg-white/30 backdrop-blur-md border border-white/30 shadow-multi transition-all duration-300"
                 >
                   <MessageSquare className="w-5 h-5 mr-2" />
-                  Start Full Chat Experience
+                  Chat Now
                 </Button>
                 <Button 
                   size="lg" 
                   variant="outline"
-                  className="border-white/30 text-primary-foreground hover:bg-white/10 backdrop-blur-md"
+                  className="border-white/30 text-primary hover:bg-white/10 backdrop-blur-md"
                 >
                   <Globe className="w-5 h-5 mr-2" />
                   Learn More
@@ -89,10 +84,71 @@ const HomePage = () => {
               </div>
             </div>
 
-            {/* Right Side - Embedded Chat Interface */}
+            {/* Right Side - Search Bar */}
             <div className="fade-in-scale">
-              <div className="glass-card p-1 rounded-2xl shadow-multi">
-                <ChatGPTInterface className="h-[500px]" />
+              <div className="glass-card p-8 rounded-2xl shadow-multi bg-white/10 backdrop-blur-md border border-white/20">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-primary-foreground mb-2">
+                    Ask Your Legal Question
+                  </h3>
+                  <p className="text-primary-foreground/80 text-sm">
+                    Get instant answers from our AI legal assistant
+                  </p>
+                </div>
+                
+                <form onSubmit={handleSearch} className="space-y-4">
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      placeholder="e.g., What should I know about employment contracts?"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full h-14 pl-4 pr-12 text-base bg-white/90 border-white/30 focus:border-white/50 rounded-xl shadow-lg placeholder:text-gray-500"
+                    />
+                    <Button
+                      type="submit"
+                      size="icon"
+                      className="absolute right-2 top-2 h-10 w-10 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg shadow-lg transition-all duration-200"
+                    >
+                      <Search className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery("Tell me about Article 350 in Indian law")}
+                      className="text-left p-3 rounded-lg bg-white/20 hover:bg-white/30 text-primary-foreground text-sm transition-all duration-200 border border-white/20 hover:border-white/40"
+                    >
+                      📜 Tell me about Article 350 in Indian law
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery("What are the essential elements of a contract?")}
+                      className="text-left p-3 rounded-lg bg-white/20 hover:bg-white/30 text-primary-foreground text-sm transition-all duration-200 border border-white/20 hover:border-white/40"
+                    >
+                      📋 What are the essential elements of a contract?
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery("Explain employment law in India")}
+                      className="text-left p-3 rounded-lg bg-white/20 hover:bg-white/30 text-primary-foreground text-sm transition-all duration-200 border border-white/20 hover:border-white/40"
+                    >
+                      💼 Explain employment law in India
+                    </button>
+                  </div>
+                </form>
+                
+                <div className="mt-6 text-center">
+                  <Button
+                    onClick={handleChatNow}
+                    variant="outline"
+                    className="border-white/30 text-primary hover:bg-white/20 backdrop-blur-md"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Start Full Chat
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -108,7 +164,7 @@ const HomePage = () => {
               Powerful Lawgic Features
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              ChainOpera's decentralized AI platform powers comprehensive legal assistance
+              TensorOpera's Gemini 2.0 Flash powers comprehensive legal assistance
             </p>
           </div>
 
@@ -142,7 +198,7 @@ const HomePage = () => {
               {
                 icon: DollarSign,
                 title: "Decentralized AI",
-                description: "Powered by ChainOpera's blockchain technology for transparent, secure legal assistance."
+                description: "Powered by TensorOpera's AI technology for transparent, secure legal assistance."
               }
             ].map((feature, index) => (
               <Card key={index} className="glass-card shadow-multi hover:shadow-glow transition-all duration-300 transform hover:-translate-y-2 glow-effect slide-up" style={{ animationDelay: `${index * 0.1}s` }}>
@@ -175,8 +231,8 @@ const HomePage = () => {
               },
               {
                 step: "02",
-                title: "ChainOpera AI Analysis",
-                description: "Our decentralized AI platform analyzes vast legal databases using blockchain technology.",
+                title: "TensorOpera AI Analysis",
+                description: "Our Gemini 2.0 Flash model analyzes vast legal databases using advanced AI technology.",
                 icon: Brain
               },
               {
@@ -310,7 +366,7 @@ const HomePage = () => {
               Ready to Experience Lawgic?
             </h2>
             <p className="text-xl mb-8 opacity-90">
-              Join the legal revolution powered by ChainOpera's decentralized AI
+              Join the legal revolution powered by TensorOpera's Gemini 2.0 Flash
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
@@ -325,7 +381,7 @@ const HomePage = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white/30 text-primary-foreground hover:bg-white/10 text-xl px-12 py-6 backdrop-blur-md"
+                className="border-white/30 text-primary hover:bg-white/10 text-xl px-12 py-6 backdrop-blur-md"
               >
                 <Scale className="w-6 h-6 mr-2" />
                 Explore Platform
@@ -333,7 +389,7 @@ const HomePage = () => {
             </div>
             <div className="mt-6 text-sm opacity-75 flex items-center justify-center gap-2">
               <Sparkles className="w-4 h-4" />
-              Powered by ChainOpera • Decentralized • Secure • Instant
+              Powered by TensorOpera • Gemini 2.0 Flash • Secure • Instant
             </div>
           </div>
         </div>
@@ -351,7 +407,7 @@ const HomePage = () => {
                 <Sparkles className="w-4 h-4 animate-pulse" />
               </div>
               <p className="opacity-90">
-                Revolutionizing legal assistance through ChainOpera's decentralized AI platform.
+                Revolutionizing legal assistance through TensorOpera's Gemini 2.0 Flash AI platform.
               </p>
             </div>
             <div>
@@ -380,7 +436,7 @@ const HomePage = () => {
             </div>
           </div>
           <div className="border-t border-white/20 mt-8 pt-8 text-center opacity-75">
-            <p>&copy; 2024 Lawgic. Built for ChainOpera AI Hackathon. Powered by decentralized AI.</p>
+            <p>&copy; 2025 Lawgic. Built for TensorOpera AI Hackathon. Powered by Gemini 2.0 Flash.</p>
           </div>
         </div>
       </footer>

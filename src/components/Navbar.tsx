@@ -68,23 +68,18 @@ const Navbar = () => {
 
           {/* CTA Buttons */}
           <motion.div 
-            className="hidden md:flex items-center space-x-4"
+            className="hidden md:flex items-center"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300">
-                Sign In
-              </Button>
-            </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button 
                 onClick={() => handleNavigation("/consult")}
                 className="bg-gradient-primary shadow-glow hover:shadow-xl transition-all duration-300"
               >
                 <MessageSquare className="w-4 h-4 mr-2" />
-                Start Chat
+                Chat Now
               </Button>
             </motion.div>
           </motion.div>
@@ -137,19 +132,14 @@ const Navbar = () => {
                 >
                   Consult
                 </motion.button>
-                <div className="flex flex-col space-y-2 pt-4">
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button variant="outline" className="w-full border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground">
-                      Sign In
-                    </Button>
-                  </motion.div>
+                <div className="pt-4">
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button 
                       onClick={() => handleNavigation("/consult")}
                       className="w-full bg-gradient-primary shadow-glow"
                     >
                       <MessageSquare className="w-4 h-4 mr-2" />
-                      Start Chat
+                      Chat Now
                     </Button>
                   </motion.div>
                 </div>
