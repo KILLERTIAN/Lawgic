@@ -56,6 +56,14 @@ const Navbar = () => {
             >
               About
             </motion.button>
+            <motion.button 
+              onClick={() => handleNavigation("/consult")}
+              className={`text-foreground hover:text-primary transition-smooth ${location.pathname === "/consult" ? "text-primary font-semibold" : ""}`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Consult
+            </motion.button>
           </motion.div>
 
           {/* CTA Buttons */}
@@ -72,7 +80,7 @@ const Navbar = () => {
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button 
-                onClick={() => handleNavigation("/")}
+                onClick={() => handleNavigation("/consult")}
                 className="bg-gradient-primary shadow-glow hover:shadow-xl transition-all duration-300"
               >
                 <MessageSquare className="w-4 h-4 mr-2" />
@@ -121,6 +129,14 @@ const Navbar = () => {
                 >
                   About
                 </motion.button>
+                <motion.button
+                  onClick={() => handleNavigation("/consult")}
+                  className={`block w-full text-left px-3 py-2 text-foreground hover:text-primary hover:bg-muted rounded-md transition-smooth ${location.pathname === "/consult" ? "text-primary font-semibold bg-muted" : ""}`}
+                  whileHover={{ x: 5 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Consult
+                </motion.button>
                 <div className="flex flex-col space-y-2 pt-4">
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button variant="outline" className="w-full border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground">
@@ -129,7 +145,7 @@ const Navbar = () => {
                   </motion.div>
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button 
-                      onClick={() => handleNavigation("/")}
+                      onClick={() => handleNavigation("/consult")}
                       className="w-full bg-gradient-primary shadow-glow"
                     >
                       <MessageSquare className="w-4 h-4 mr-2" />

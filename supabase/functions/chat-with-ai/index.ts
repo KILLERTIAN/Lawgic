@@ -86,7 +86,7 @@ Format responses in a professional, easy-to-understand manner with proper legal 
     console.error('Error in chat-with-ai function:', error)
     
     // Fallback response for demo purposes
-    const fallbackResponse = `Thank you for your legal question: "${message}". 
+    const fallbackResponse = `Thank you for your legal question: "${currentMessage}".
 
 As Lawgic, your AI Legal Assistant powered by ChainOpera's decentralized platform, I can provide general legal information. However, please note that this is not legal advice and should not substitute for consultation with a qualified attorney.
 

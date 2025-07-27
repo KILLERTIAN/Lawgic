@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import Navbar from "./Navbar";
 import HeroSection from "./HeroSection";
-import ChatInterface from "./ChatInterface";
+import ChatGPTInterface from "./ChatGPTInterface";
 
 const HomePage = () => {
   const [showFullChat, setShowFullChat] = useState(false);
@@ -38,7 +38,7 @@ const HomePage = () => {
               ← Back to Home
             </Button>
           </div>
-          <ChatInterface />
+          <ChatGPTInterface />
         </div>
       </div>
     );
@@ -92,7 +92,7 @@ const HomePage = () => {
             {/* Right Side - Embedded Chat Interface */}
             <div className="fade-in-scale">
               <div className="glass-card p-1 rounded-2xl shadow-multi">
-                <ChatInterface />
+                <ChatGPTInterface className="h-[500px]" />
               </div>
             </div>
           </div>
